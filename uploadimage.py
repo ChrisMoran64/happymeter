@@ -20,16 +20,15 @@ if len(sys.argv) == 4:
 
 #Send the file to our bucket for processing
 #	
-	try:
-		print 'Opening image'
-		upload_name = camdir + '/' + filename
-		data = open(filename, 'rb')
-		s3 = boto3.resource('s3')
-		print 'Establishing connection'
-		s3.Bucket(bucket).put_object(Key=filename, Body=data)
-		print 'done'
-	except:
-		print 'Something went wrong.'
+	print 'Opening image'
+	upload_name = camdir + '/' + filename
+	data = open(filename, 'rb')
+	s3 = boto3.resource('s3')
+	print 'Establishing connection'
+	s3.Bucket(bucket).put_object(Key=upload_name, Body=data)
+	print 'done'
+	data.close()
+	os.unlink(filename)
 	
 else:
 	print 'Usage: ', sys.argv[0], ' file_name bucket cam_id'
