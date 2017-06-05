@@ -14,7 +14,7 @@ rekognition = boto3.client('rekognition')
 
 
 def detect_faces(bucket, key):
-    response = rekognition.detect_faces(Image={"S3Object": {"Bucket": bucket, "Name": key}})
+    response = rekognition.detect_faces(Attributes=["ALL"],Image={"S3Object": {"Bucket": bucket, "Name": key}})
     return response
 
 
@@ -59,7 +59,9 @@ def lambda_handler(event, context):
         #response = index_faces(bucket, key)
 
         # Print response to console.
-        print(response)
+        print(response["FaceDetails"][0]["Emotions"][0]["Type"], response["FaceDetails"][0]["Emotions"][0]["Confidence"])
+        print(response["FaceDetails"][0]["Emotions"][1]["Type"], response["FaceDetails"][0]["Emotions"][1]["Confidence"])
+        print(response["FaceDetails"][0]["Emotions"][2]["Type"], response["FaceDetails"][0]["Emotions"][2]["Confidence"])
 
         return response
     except Exception as e:
