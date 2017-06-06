@@ -3,13 +3,12 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: Customer Sentiment Lambda Task
 
 Parameters:
-  ConfigBucket:
-    Type: String
-    Default: custsenti-conf
-
   ConfigPkg:
     Type: String
     Default: happymeter.zip
+
+  ConfigStack:
+    Type: String
     
   Region:
     Type: String
@@ -24,7 +23,8 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Code:
-        S3Bucket: !Ref "ConfigBucket"
+        S3Bucket:
+          Fn::ImportValue: !Sub "${ConfigStack}-BucketId"
         S3Key: !Ref "ConfigPkg"
       Description: 'Extract Emotion data using Rekognition'
       Handler: index.handler
@@ -36,6 +36,15 @@ Resources:
           Key: Name
           Value: happymeter-lambda-detect-faces
       Timeout: 5
+
+  LambdaPermission:
+    DeletionPolicy: Delete
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt [ Lambda1, Arn ]
+      Action: 'lambda:InvokeFunction'
+      Principal: 's3.amazonaws.com'
+      SourceAccount: !Ref 'AWS::AccountId'
 
 Outputs:
   LambdaId:

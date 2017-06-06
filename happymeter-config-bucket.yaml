@@ -3,10 +3,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: Customer Sentiment S3 Configuration
 
 Parameters:
-  BucketName:
-    Type: String
-    Default: custsenti-conf
-
   Region:
     Type: String
     AllowedValues: [ us-east-1, us-west-1, eu-west-1 ]
@@ -16,7 +12,7 @@ Resources:
     DeletionPolicy: Delete
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Ref "BucketName"
+#      BucketName: !Ref "BucketName"
       AccessControl: BucketOwnerFullControl
       Tags:
         -
@@ -27,6 +23,6 @@ Outputs:
   BucketId:
     Value: !Ref "ConfigBucket"
     Export:
-      Name: !Sub "${AWS::StackName}-ConfigBucket"
+      Name: !Sub "${AWS::StackName}-BucketId"
 
       

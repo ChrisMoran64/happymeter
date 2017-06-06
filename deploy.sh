@@ -8,9 +8,10 @@
 zip ${PKG_NAME} ${SRC_NAME}
 
 # Create the configuration bucket
-aws cloudformation deploy --template-file happymeter-config-bucket.yaml --stack-name Happyness-Config --parameter-overrides BucketName=${CONF_BUCKET} Region=${REGION} --region ${REGION} --profile ${PROFILE}
+aws cloudformation deploy --template-file happymeter-config-bucket.yaml --stack-name Happyness-Config --parameter-overrides Region=${REGION} --region ${REGION} --profile ${PROFILE}
 
 # Upload our Lambda source package
+CONF_BUCKET=$(aws cloudformation describe-stacks --stack-name Happyness-Config --profile $PROFILE --region $REGION --output text --query 'Stacks[0].Outputs[0].OutputValue')
 aws s3 mv ${PKG_NAME} s3://${CONF_BUCKET}/${PKG_NAME} --profile ${PROFILE}
 
 # Create the IAM Roles
@@ -18,8 +19,12 @@ aws cloudformation deploy --template-file happymeter-roles.yaml --stack-name Hap
 IAM_ARN=$(aws cloudformation describe-stacks --stack-name Happyness-Roles --profile $PROFILE --region $REGION --output text --query 'Stacks[0].Outputs[*].OutputValue')
 
 # Create the Lambda function
-aws cloudformation deploy --template-file happymeter-lambda.yaml --stack-name Happyness-Lambda --parameter-overrides ConfigBucket=${CONF_BUCKET} ConfigPkg=${PKG_NAME} Region=${REGION} RoleStack=Happyness-Roles --region ${REGION} --profile ${PROFILE}
+aws cloudformation deploy --template-file happymeter-lambda.yaml --stack-name Happyness-Lambda --parameter-overrides ConfigPkg=${PKG_NAME} ConfigStack=Happyness-Config Region=${REGION} RoleStack=Happyness-Roles --region ${REGION} --profile ${PROFILE}
 LAMBDA_ARN=$(aws cloudformation describe-stacks --stack-name Happyness-Lambda --profile $PROFILE --region $REGION --output text --query 'Stacks[0].Outputs[0].OutputValue')
 
 # Create the data bucket for the cams
-aws cloudformation deploy --template-file happymeter-s3.yaml --stack-name Happyness-Storage --parameter-overrides BucketName=${DATA_BUCKET} Region=${REGION} LambdaArn=${LAMBDA_ARN} LambdaStack=Happyness-Lambda --region ${REGION} --profile ${PROFILE}
+aws cloudformation deploy --template-file happymeter-s3.yaml --stack-name Happyness-Storage --parameter-overrides BucketName=${DATA_BUCKET} Region=${REGION} LambdaStack=Happyness-Lambda --region ${REGION} --profile ${PROFILE}
+DATA_BUCKET=$(aws cloudformation describe-stacks --stack-name Happyness-Storage --profile $PROFILE --region $REGION --output text --query 'Stacks[0].Outputs[0].OutputValue')
+
+# There seems to be a race condition in creating bucket notifications in CFN.  Hopefully, this gets around the problem
+# aws s3api  put-bucket-notification-configuration --bucket ${DATA_BUCKET} --notification-configuration file://databucket-notification.json --region ${REGION} --profile ${PROFILE}

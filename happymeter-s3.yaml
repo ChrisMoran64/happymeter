@@ -3,13 +3,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: Customer Sentiment S3 Configuration
 
 Parameters:
-  BucketName:
-    Type: String
-    Default: custsenti-us
-
-  LambdaArn:
-    Type: String
-
   LambdaStack:
     Type: String
 
@@ -23,11 +16,14 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       AccessControl: BucketOwnerFullControl
-      BucketName: !Ref 'BucketName'
+      LifecycleConfiguration:
+        Rules:
+          - Id: PurgeRule
+            ExpirationInDays: 7
+            Status: Enabled
       NotificationConfiguration:
         LambdaConfigurations:
-          -
-            Function:
+          - Function:
               Fn::ImportValue: !Sub '${LambdaStack}-LambdaArn'
             Event: 's3:ObjectCreated:*'
             Filter:
