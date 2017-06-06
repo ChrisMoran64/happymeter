@@ -1,0 +1,44 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Customer Sentiment S3 Configuration
+
+Parameters:
+  BucketName:
+    Type: String
+    Default: custsenti-us
+
+  LambdaArn:
+    Type: String
+
+  Region:
+    Type: String
+    AllowedValues: [ us-east-1, us-west-1, eu-west-1 ]
+
+Resources:
+  ImageBucket:
+    DeletionPolicy: Retain
+    Type: AWS::S3::Bucket
+    Properties:
+      AccessControl: BucketOwnerFullControl
+      BucketName: !Ref "BucketName"
+      NotificationConfiguration:
+        LambdaConfigurations:
+          -
+            Function: !Ref "LambdaArn"
+            Event: "s3:ObjectCreated:*"
+            Filter:
+              S3Key:
+                Rules:
+                  -
+                    Name: suffix
+                    Value: jpg
+      Tags:
+        -
+          Key: Name
+          Value: happymeter-s3-data
+
+Outputs:
+  BucketId:
+    Value: !Ref "ImageBucket"
+    Export:
+      Name: !Sub "${AWS::StackName}-ImageBucket"
