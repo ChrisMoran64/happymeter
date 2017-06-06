@@ -26,5 +26,3 @@ LAMBDA_ARN=$(aws cloudformation describe-stacks --stack-name Happyness-Lambda --
 aws cloudformation deploy --template-file happymeter-s3.yaml --stack-name Happyness-Storage --parameter-overrides BucketName=${DATA_BUCKET} Region=${REGION} LambdaStack=Happyness-Lambda --region ${REGION} --profile ${PROFILE}
 DATA_BUCKET=$(aws cloudformation describe-stacks --stack-name Happyness-Storage --profile $PROFILE --region $REGION --output text --query 'Stacks[0].Outputs[0].OutputValue')
 
-# There seems to be a race condition in creating bucket notifications in CFN.  Hopefully, this gets around the problem
-# aws s3api  put-bucket-notification-configuration --bucket ${DATA_BUCKET} --notification-configuration file://databucket-notification.json --region ${REGION} --profile ${PROFILE}
