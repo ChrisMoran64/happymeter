@@ -10,6 +10,9 @@ Parameters:
   LambdaArn:
     Type: String
 
+  LambdaStack:
+    Type: String
+
   Region:
     Type: String
     AllowedValues: [ us-east-1, us-west-1, eu-west-1 ]
@@ -20,12 +23,13 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       AccessControl: BucketOwnerFullControl
-      BucketName: !Ref "BucketName"
+      BucketName: !Ref 'BucketName'
       NotificationConfiguration:
         LambdaConfigurations:
           -
-            Function: !Ref "LambdaArn"
-            Event: "s3:ObjectCreated:*"
+            Function:
+              Fn::ImportValue: !Sub '${LambdaStack}-LambdaArn'
+            Event: 's3:ObjectCreated:*'
             Filter:
               S3Key:
                 Rules:

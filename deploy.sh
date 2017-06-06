@@ -18,8 +18,8 @@ aws cloudformation deploy --template-file happymeter-roles.yaml --stack-name Hap
 IAM_ARN=$(aws cloudformation describe-stacks --stack-name Happyness-Roles --profile $PROFILE --region $REGION --output text --query 'Stacks[0].Outputs[*].OutputValue')
 
 # Create the Lambda function
-aws cloudformation deploy --template-file happymeter-lambda.yaml --stack-name Happyness-Lambda --parameter-overrides ConfigBucket=${CONF_BUCKET} ConfigPkg=${PKG_NAME} Region=${REGION} RoleArn=${IAM_ARN} --region ${REGION} --profile ${PROFILE}
+aws cloudformation deploy --template-file happymeter-lambda.yaml --stack-name Happyness-Lambda --parameter-overrides ConfigBucket=${CONF_BUCKET} ConfigPkg=${PKG_NAME} Region=${REGION} RoleStack=Happyness-Roles --region ${REGION} --profile ${PROFILE}
 LAMBDA_ARN=$(aws cloudformation describe-stacks --stack-name Happyness-Lambda --profile $PROFILE --region $REGION --output text --query 'Stacks[0].Outputs[0].OutputValue')
 
 # Create the data bucket for the cams
-aws cloudformation deploy --template-file happymeter-s3.yaml --stack-name Happyness-Storage --parameter-overrides BucketName=${DATA_BUCKET} Region=${REGION} LambdaArn=${LAMBDA_ARN} --region ${REGION} --profile ${PROFILE}
+aws cloudformation deploy --template-file happymeter-s3.yaml --stack-name Happyness-Storage --parameter-overrides BucketName=${DATA_BUCKET} Region=${REGION} LambdaArn=${LAMBDA_ARN} LambdaStack=Happyness-Lambda --region ${REGION} --profile ${PROFILE}

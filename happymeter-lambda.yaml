@@ -15,7 +15,7 @@ Parameters:
     Type: String
     AllowedValues: [ us-east-1, us-west-1, eu-west-1 ]
 
-  RoleArn:
+  RoleStack:
     Type: String
   
 Resources:
@@ -28,7 +28,8 @@ Resources:
         S3Key: !Ref "ConfigPkg"
       Description: 'Extract Emotion data using Rekognition'
       Handler: index.handler
-      Role: !Ref "RoleArn"
+      Role:
+          Fn::ImportValue: !Sub "${RoleStack}-PolicyArn"
       Runtime: python2.7
       Tags:
         -
