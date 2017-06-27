@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Raspberry Pi script to capture a webcam image
+# General script to capture a webcam image
 #
 
 CAMERAID="camera00"
