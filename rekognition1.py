@@ -20,12 +20,6 @@ def detect_faces(bucket, key):
 
 def detect_labels(bucket, key):
     response = rekognition.detect_labels(Image={"S3Object": {"Bucket": bucket, "Name": key}})
-
-    # Sample code to write response to DynamoDB table 'MyTable' with 'PK' as Primary Key.
-    # Note: role used for executing this Lambda function should have write access to the table.
-    #table = boto3.resource('dynamodb').Table('MyTable')
-    #labels = [{'Confidence': Decimal(str(label_prediction['Confidence'])), 'Name': label_prediction['Name']} for label_prediction in response['Labels']]
-    #table.put_item(Item={'PK': key, 'Labels': labels})
     return response
 
 
@@ -51,12 +45,6 @@ def lambda_handler(event, context):
     try:
         # Calls rekognition DetectFaces API to detect faces in S3 object
         response = detect_faces(bucket, key)
-
-        # Calls rekognition DetectLabels API to detect labels in S3 object
-        #response = detect_labels(bucket, key)
-
-        # Calls rekognition IndexFaces API to detect faces in S3 object and index faces into specified collection
-        #response = index_faces(bucket, key)
 
         # Print response to console.
         print(response["FaceDetails"][0]["Emotions"][0]["Type"], response["FaceDetails"][0]["Emotions"][0]["Confidence"])
