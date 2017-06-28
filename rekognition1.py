@@ -56,14 +56,19 @@ def lambda_handler(event, context):
         # Calls rekognition DetectFaces API to detect faces in S3 object.
         response = detect_faces(bucket, key)
 
+        # Print response to console.
+        #print(response["FaceDetails"][0]["Emotions"][0]["Type"], response["FaceDetails"][0]["Emotions"][0]["Confidence"])
+        #print(response["FaceDetails"][0]["Emotions"][1]["Type"], response["FaceDetails"][0]["Emotions"][1]["Confidence"])
+        #print(response["FaceDetails"][0]["Emotions"][2]["Type"], response["FaceDetails"][0]["Emotions"][2]["Confidence"])
+
         # Print response to console and commit to database.
         for em in response["FaceDetails"]:
             for res in em["Emotions"]:
                 print("Emotion: ", res["Type"], "Confidence: ", res["Confidence"])
                 save_reaction(key, res["Type"], res["Confidence"])
 
-
         return response
+
     except Exception as e:
         print(e)
         print("Error processing object {} from bucket {}. ".format(key, bucket) +
