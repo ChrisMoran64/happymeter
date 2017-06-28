@@ -1,0 +1,5 @@
+SHELL=/bin/bash
+MAILTO=""
+# Execute the camera script every minute
+# m h  dom mon dow   command
+#* * * * * $HOME/camera.sh
