@@ -5,10 +5,13 @@ import json
 import urllib
 import boto3
 import uuid
+import datetime
+import calendar
 
 print('Loading function')
 
 rekognition = boto3.client('rekognition')
+db = boto3.resource('dynamodb').Table('Sentiments')
 
 
 # --------------- Helper Functions to call Rekognition APIs ------------------
@@ -19,10 +22,14 @@ def detect_faces(bucket, key):
     return response
     
 def save_reaction(key, emotion, confidence):
-    db = boto3.resource('dynamodb').Table('Sentiments')
-    data =[ {'Emotion': str(emotion), 'Confidence': Decimal(str(confidence)) } ]
+# Generate a timestamp
+    t = datetime.datetime.utcnow()
+    ts = int(calendar.timegm(t.timetuple()) * 1000)
+#    data =[ {'Emotion': str(emotion), 'Confidence': Decimal(str(confidence)) } ]
 #    db.put_item(Item={ 'EntryId': str(uuid.uuid4()), 'ImageId': key, 'Data': data })
-    db.put_item(Item={ 'EntryId': '1', 'ImageId': key, 'Data': data })
+#    print('EntryId:', '1', 'TimeStamp:', ts, 'ImageId:', key, 'Emotion:', str(emotion), 'Confidence:', Decimal(str(confidence)) )
+#    db.put_item(Item={ 'EntryId': '1', 'TimeStamp': ts, 'ImageId': key, 'Emotion': str(emotion), 'Confidence': Decimal(str(confidence)) })
+    db.put_item(Item={ 'EntryId': '1', 'TimeStamp': ts, 'ImageId': str(uuid.uuid4()), 'File': key, 'Emotion': str(emotion), 'Confidence': Decimal(str(confidence)) })
 
 
 def detect_labels(bucket, key):
